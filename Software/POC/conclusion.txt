@@ -1,0 +1,63 @@
+Time: the cycle is starting
+The total cycle time is:15
+6946221
+6946236
+Inner cyle:
+5
+Outer cyle:
+155
+0:1
+1:0
+2:0
+3:0
+4:0
+5:0
+6:0
+7:0
+8:0
+9:0
+10:0
+11:0
+12:0
+13:0
+14:0
+15:0
+16:0
+17:0
+18:1
+19:1
+20:0
+21:0
+22:0
+23:0
+24:0
+25:0
+26:0
+27:0
+28:0
+29:0
+30:0
+
+
+a teljes ciklusidő 15 ms, úgy, hogy 5x 3 ms delay volt benne, szóval nem a read-in lesz a szűk keresztmetszet.
+kérdés, hogy betáp váltásnál mennyi időzítés kell, de az a dióda lezárási idejétől függ majd
+ezzel a mért ciklussal lett a fenti eredmény: 
+
+//*******************Timed section***************
+
+byte outerCyclecounter = 0;
+byte innerCyclecounter = 0;
+//Cycle to read out all input values, divided into 4 sections
+  for (int i = digitalOutputPinNumberStart; i <= digitalOutputPinNumberEnd; i++){
+      digitalWrite(inputPinNumberArray[i], HIGH); 
+      outerCyclecounter++;
+      for (int index = digitalInputPinNumberStart; index <= digitalInputPinNumberEnd; index++){
+        inputStateArray[index] = digitalRead( inputPinNumberArray[index] );
+        innerCyclecounter++;
+        }
+      digitalWrite(inputPinNumberArray[i], LOW);
+      delay(3);
+  }
+  
+  
+//******************End of timed section********* 
