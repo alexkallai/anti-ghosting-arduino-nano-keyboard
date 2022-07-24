@@ -2,15 +2,19 @@ unsigned long cycleStartTime;
 unsigned long cycleEndTime;
 unsigned long totalCycleTime;
 
-//Ordered pin numbers, though not checked yet
-int inputPinNumberArray [52] ={13,2,3,4,5,6,7,8,9,10,11,12,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53};
-byte inputStateArray [52];
-//How many inputs do we actually need? 4 * 30 = 120 -> 104 is needed
-byte digitalInputPinNumberStart = 0;
-byte digitalInputPinNumberEnd = 7;
+unsigned long cycleStartTimeMicro;
+unsigned long cycleEndTimeMicro;
+unsigned long totalCycleTimeMicro;
 
-byte digitalOutputPinNumberStart = 8;
-byte digitalOutputPinNumberEnd = 12;
+//Ordered pin numbers, though not checked yet
+int inputPinNumberArray [19] ={0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18};
+byte inputStateArray [19];
+//How many inputs do we actually need? 12 * 10 = 120 -> 104 is needed
+byte digitalInputPinNumberStart = 0;
+byte digitalInputPinNumberEnd = 9;
+
+byte digitalOutputPinNumberStart = 10;
+byte digitalOutputPinNumberEnd = 19;
 
 void setup() {
   
@@ -19,7 +23,7 @@ void setup() {
   for (int index = digitalInputPinNumberStart; index <= digitalInputPinNumberEnd; index++){
     pinMode( inputPinNumberArray[index], INPUT );
     }
-
+  // Setting up the output pins
   for (int index = digitalOutputPinNumberStart; index <= digitalOutputPinNumberEnd; index++){
      pinMode(inputPinNumberArray[index], OUTPUT);
     }
@@ -32,6 +36,7 @@ void loop() {
   Serial.println("Time: the cycle is starting");
   //Record time at start of cycle
   cycleStartTime = millis();
+  cycleStartTimeMicro = micros();
 //*******************Timed section***************
 
 byte outerCyclecounter = 0;
@@ -45,16 +50,27 @@ byte innerCyclecounter = 0;
         innerCyclecounter++;
         }
       digitalWrite(inputPinNumberArray[i], LOW);
-      delay(3);
+      // Delay so transient stuff can end
+      //delay(1);
+      delayMicroseconds(50);
   }
   
   
 //******************End of timed section*********  
   cycleEndTime = millis();
+  cycleEndTimeMicro = micros();
+  totalCycleTimeMicro = cycleEndTimeMicro - cycleStartTimeMicro;
+  
   totalCycleTime = cycleEndTime - cycleStartTime;
+  int cycles_per_sec = 1000000 / totalCycleTimeMicro;
 
   Serial.print("The total cycle time is:");
   Serial.println(totalCycleTime); // prints time since program started
+  Serial.print("The total cycle time in microseconds is:");
+  Serial.println(totalCycleTimeMicro); // prints time in microseconds since program started
+  Serial.print("Cycles in one second:");
+  Serial.println(cycles_per_sec);
+  Serial.print("Start and stop time:");
   Serial.println(cycleStartTime);
   Serial.println(cycleEndTime);
 
@@ -62,7 +78,8 @@ byte innerCyclecounter = 0;
   Serial.println(outerCyclecounter);
   Serial.println("Outer cyle:");
   Serial.println(innerCyclecounter);
-  
+
+  Serial.println("State of the last input states:");
   for (int index = digitalInputPinNumberStart; index <= digitalInputPinNumberEnd; index++){
     Serial.print(index);
     Serial.print(":");
